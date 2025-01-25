@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D&D Campaign Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="test.yaml">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+</head>
+<body>
+  <div id="app">
+    <!-- Left Column -->
+    <div class="column left">
+      <div id="locations-and-encounters">
+        <ul id="locations-list"></ul>
+      </div>
+      
+      <div id="add-location-container" class="hidden">
+        <input type="text" id="new-location-name" placeholder="New Location Name">
+        <button id="confirm-add-location" class="icon-btn check"><i class="fas fa-check"></i></button>
+
+      </div>
+      <div class="file-actions">
+
+  <div class="notebook-dropdown">
+    <label for="notebook-select">Notebook:</label>
+    <select id="notebook-select">
+      <option value="add-new" style="font-style: italic;">Add Notebook</option>
+    </select>
+  </div>
+  
+  <button id="save-notebook">Save</button>
+  <button id="delete-notebook">Delete</button>
+  <button id="rename-notebook">Rename</button>
+
+
+  <button id="load-yaml">Import YAML</button>
+  <button id="save-yaml">Export YAML</button>
+
+  <div id="notification-area" class="notification-area"></div>
+
+  <div id="modal-container" class="modal-container hidden">
+    <div class="modal">
+      <p id="modal-message"></p>
+      <input id="modal-input" class="hidden" type="text" placeholder="Enter notebook name">
+      <div class="modal-actions">
+        <button id="modal-confirm">Confirm</button>
+        <button id="modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+  
+
+  
+</div>
+<div class="edit-mode-toggle">
+  <label>
+    <input type="checkbox" id="edit-mode-toggle"> Edit Mode
+  </label>
+</div>
+
+    </div>
+
+    <!-- Middle Column -->
+    <div class="column middle">
+      <h2>
+        <span id="encounter-name">Select an Encounter</span>
+        <button id="edit-encounter" class="hidden edit-mode icon-btn edit">
+          <i class="fas fa-pencil-alt"></i>
+        </button>      <button id="confirm-edit-encounter" class="icon-btn check hidden">
+          <i class="fas fa-check"></i>
+        </button>
+              </h2>
+      <div id="encounter-content">Content will appear here</div>
+      <textarea id="encounter-edit-content" class="hidden"></textarea>
+    </div>
+
+    <!-- Right Column -->
+    <div class="column right">
+      <div class="initiative-tracker">
+<div id="initiative-tracker-grid" class="initiative-tracker-grid">
+  <!-- Header Row -->
+  <div>#</div>
+  <div>Name</div>
+  <div>HP</div>
+  <div>AC</div>
+  <div>-</div>
+
+</div>
+<div class="initiative-tracker-buttons">
+  <button id="add-row" class="icon-btn add"><i class="fas fa-plus"></i></button>
+</div>
+
+      </div>
+      <div class="creatures-list" id="creatures-list-div">
+        <ul id="creatures-list"></ul>
+        <div id="add-creature-container" class="hidden">
+          <input type="text" id="new-creature-name" placeholder="New Creature Name">
+          <button id="confirm-add-creature" class="icon-btn check"><i class="fas fa-check"></i></button>
+        </div>
+      </div>
+      <div class="statblock" id="statblock" style = "display:block">
+        <div>
+          <button id="edit-statblock" class="edit-mode icon-btn edit" class="hidden"></button>
+          <button id="confirm-statblock" class="hidden icon-btn check"></button>
+        </div>
+        <div id="statblock-content">Select a creature to see details</div>
+        <textarea id="statblock-edit-content" class="hidden"></textarea>
+      </div>
+    </div>
+  </div>
+  <script src="main.js"></script>
+  <script src="initiative-tracker.js"></script>
+  <script src="notebook.js"></script>
+  <script src="creatures.js"></script>
+  <script src="encounters.js"></script>
+  <script src="locations.js"></script>
+  <script src="ui-helpers.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,102 @@
+name: Cry of the Sea
+locations:
+  - name: Canticle Bay
+    encounters:
+      - name: Mayor's Mansion
+        content: >
+          The party has been summoned to meet with the mayor, Hamish Grindle.
+          He can be found at the government residence, a vast mansion overlooking the sea.
+          Grindle is a human man (noble) with delusions of grandeur. Grindle’s main concern
+          about the missing men is that they are needed to work and keep the economy going.
+          He is dismissive of the ‘emotional’ concerns of women whose family members are missing.
+          He tells the group that when the fish started disappearing about 10 weeks ago, the men
+          went further out to sea and started to disappear.
+
+          Hamish offers the group a substantial reward (500 gp, with 250 gp up front) if they can figure
+          out where the men have gone and stop it from happening again. Hamish directs them to the
+          Shrivelled Barnacle, a tavern popular with seafaring types right near the harbour, to find a ship
+          and crew. If the group contains any men, Hamish directs all of his commentary to them. If the
+          group is comprised solely of women, he treats them dismissively, and it’s clear he believes they
+          cannot solve the problem but allows them to try anyway.
+        creatures: []
+      - name: Canticle Bay Description
+        content: >
+          Canticle Bay is a bustling port town. Warm wind blows off the sea, moving the palm trees
+          further into town. The houses are mostly are pulled from the market by the sea to edge of town,
+          to head off to the inland communities. At night, you can hear what sounds like bay. Locals call
+          it "the cry of the sea."
+        creatures: []
+      - name: The Shrivelled Barnacle
+        content: >
+          When they arrive at the Shrivelled Barnacle, the characters interrupt an escalating argument.
+          Two people stand in the middle of the room, with the crowd circled around them. One is Rax
+          Vander (veteran), a burly combative half orc, shaking a fist in her opponent’s face. The opponent
+          is Yorin Handal (noble), a weaselly looking half-elf, dressed in fine clothes. They are arguing
+          about whose ship is better. Rax shouts about her sailing prowess, and taunts Yorin for the loss
+          of two of his crew members last week. The crowd heckles her, shouting that women aren’t made
+          to sail. Her two dwarven crew members (scouts) toss insults back at the crowd. Yorin brags of
+          the speed and size of his ship, boasting that it’s the newest and finest you can buy along the coast.
+          His sizeable crew of young men backs him up.
+
+          If the characters don’t step in, the barkeep will eventually break up the argument. Rax, Yorin, and
+          their respective crews move to opposite sides of the tavern, glaring at each other. If the characters
+          do step in, the NPCs they defend thank them when the dust settles. If the characters divulge their
+          mission, each captain offers to accompany the group for a fee.
+
+          What Rax Knows
+          If the characters speak with Rax, she reveals the following information:
+          • She arrived in Canticle Bay to assist in finding the missing men, but everyone has refused to hire her.
+          • She has a small sloop-type ship (see "Keelboat Stats," Chapter 9, DMG) that she plans to use to
+            explore the sea and islands around Canticle Bay.
+          • She has been investigating the singing and knows the general area it comes from.
+          • She will accompany them on their mission for 40 gp (halved if they stepped in to defend her during
+            the argument).
+
+          What Yorin Knows
+          If the characters speak with Yorin, he reveals the following information:
+          • His father has outfitted him with the most expensive ship, a galleon type ship (see Chapter 9, DMG),
+            less than a year old, and the best crew money can buy.
+          • His ship can withstand almost any monster the sea has to offer.
+          • He’s heard rumour of survivors taking refuge on an island.
+          • He will accompany them on their mission for 100 gp (halved if they stepped in to defend him during
+            the argument).
+
+          Whomever the characters choose, the captain and their crew escort the characters to their ship in the
+          harbour, and plans are made to set out at dawn the next day.
+        creatures: []
+  - name: The Sea and Surrounding Islands
+    encounters:
+      - name: Travel to the Islands
+        content: >
+          In this chapter, characters can explore the sea and islands around Canticle Bay by ship, while searching
+          for the men and/or the beast(s) who took them. The ease of exploring Canticle Bay depends on which
+          captain the group has hired. If they hired Rax, her small boat easily navigates in and around islands,
+          allowing the crew to come up nearly to the shore. However, it is more susceptible to bad weather or
+          attacks by large sea monsters. If they hired Yorin, the boat easily withstands bad weather and deflects
+          monsters, but it must be moored a significant distance from the islands, making it more difficult to explore
+          or make a hasty getaway if necessary. The weather on the sea can be unpredictable. If you would like to
+          include weather as a factor, refer to the weather table in Chapter 5, "Adventure Environments" (DMG).
+
+          Environmental destruction and ocean collapse from overfishing are easily seen while exploring the area
+          around the bay. Characters might see collapsing or dead coral reef, little to no fish or marine life, and
+          limited birds. While exploring the islands, a siren scout may investigate (see the siren’s stat block on
+          pg. 20). She can lead the players in the right direction, or may use her luring song to try and capture
+          any men in the party.
+        creatures: []
+      - name: Random Island Encounters
+        content: >
+          Two islands are outlined below in more detail, but, if the party wants to explore more, roll on the chart
+          for things found on or near islands around Canticle Bay:
+          1. 2d4 + 1 dolphins surround and swim with the boat, begging for food (see the dolphin stat block on
+             pg. 20).
+          2. An island that is an inactive volcano. A band of monkeys (apes, each with 9 HP) live on the island,
+             and they constantly try to steal things from the party.
+          3. An island that is home to a sahuagin priestess and her followers. They may try to recruit the party
+             into their cult.
+          4. A corrupted island that is home to a lonely sea hag. She is grateful for the visitors, and may try to
+             trick them into staying.
+          5. A mother plesiosaur aggressively defends her two babies when the boat gets too close.
+          6. A message in a bottle floats near the boat or the shore of an island. The message contains a treasure
+             map. Following the map leads to a child’s toys buried in the sand (a bag of marbles, strangely shaped
+             rocks, and a small wood carving of a ship).
+        creatures: []

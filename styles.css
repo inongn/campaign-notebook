@@ -1,0 +1,432 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+#app {
+  display: flex;
+  height: 100%;
+}
+
+.column {
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+
+
+.file-actions,
+.edit-mode-toggle {
+  margin-top: auto; /* Push these elements to the bottom */
+}
+
+
+.left {
+  flex: 1;
+  background-color: #f7f7f7;
+  border-right: 1px solid #ddd;
+}
+
+.middle {
+  flex: 3;
+  background-color: #fff;
+}
+
+.right {
+  flex: 2;
+  background-color: #f7f7f7;
+  border-left: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.initiative-tracker,
+.creatures-list,
+.statblock {
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+/* Right column layout */
+.column.right {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent scrolling for the entire column */
+}
+
+/* Statblock scrollable container */
+.statblock {
+  flex-grow: 1; /* Allow the statblock to take up remaining space */
+  overflow-y: auto; /* Add a vertical scrollbar if content overflows */
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  
+}
+
+ul li {
+  cursor: pointer;
+  padding: 0.1rem;
+  padding-left: 1rem;
+  border: 1px solid transparent;
+}
+
+
+h2, h3 {
+  margin-top: 0;
+}
+
+h5 {
+  margin-bottom: 1px;
+}
+
+.hidden {
+  display: none;
+}
+
+.file-actions {
+  margin-top: 1rem;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  resize: vertical;
+  margin: 1rem 0;
+}
+
+.file-actions button, button#add-location {
+  margin-top: .5rem;
+  padding: .5rem 1rem;
+  border-radius: 5px;
+}
+
+/* Style for the encounter and creature lists (clickable) */
+#locations-list li, 
+#creatures-list li {
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+#locations-list li {
+  position: relative; /* Allow button to position relative to the li */
+  line-height: 1.2; /* Match the line height of the text */
+}
+
+#locations-list li:hover, 
+#creatures-list li:hover {
+  background-color: #eaeaea;
+  border: 1px solid #ddd;
+}
+
+/* Ensure statblock list items and encounter markdown list items are not clickable */
+.statblock ul li,
+#encounter-content ul li {
+  cursor: default;
+  padding: 0;
+  border: none;
+}
+
+.statblock ul {
+  margin-top: 1px;
+  }
+
+/* Add bullets to markdown content list items */
+#encounter-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+
+/* Remove bullets from the creature list */
+#creatures-list ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+/* Initiative Tracker Grid */
+.initiative-tracker-grid {
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr 1fr 1fr; /* 5 equal columns */
+  gap: 0.5rem;
+  overflow-x: auto; /* Prevent overflow */
+  padding: 5px;
+}
+
+.initiative-tracker-grid div{
+  border: 0px !important;
+}
+
+.initiative-tracker-grid div,
+.initiative-tracker-grid input {
+  text-align: center;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.initiative-tracker-grid input {
+  width: 100%; /* Ensure inputs fit grid cells */
+  box-sizing: border-box;
+}
+
+.initiative-tracker-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0;
+}
+
+
+/* Popup for roll results */
+.roll-popup {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: fade-in 0.3s ease-in-out;
+}
+
+/* Fade-in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.edit-mode-toggle {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.notebook-dropdown {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.notebook-dropdown select {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Notification area container */
+.notification-area {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  max-width: 300px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Notification message styling */
+.notification-message {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  animation: fade-out 3s ease forwards;
+}
+
+/* Fade-out animation */
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+/* Modal container */
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* Modal content */
+.modal {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 300px;
+}
+
+.modal p {
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.modal input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-actions button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.modal-actions button:hover {
+  opacity: 0.9;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#encounter-edit-content {
+  width: 100%; /* Full width of the container */
+  height: calc(100vh - 200px); /* Adjust height based on available viewport space */
+  resize: none; /* Prevent manual resizing */
+  box-sizing: border-box; /* Include padding and border in height/width calculations */
+  padding: 10px; /* Add some padding for better readability */
+  font-family: monospace; /* Optional: Use a monospace font for better markdown editing */
+  font-size: 1rem; /* Adjust font size for readability */
+}
+#statblock-edit-content {
+  height: 70%;
+}
+
+/* General Icon Styling */
+button.icon-btn {
+  background: none !important;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.icon-btn:hover {
+  opacity: 0.8; /* Slight opacity on hover */
+}
+
+button.icon-btn.trash {
+  color: red; /* Red for trash icon */
+}
+
+button.icon-btn.add {
+  color: green; /* Green for "+" icon */
+}
+
+button.icon-btn.edit {
+  color: gray; /* Gray for pencil icon */
+}
+
+button.icon-btn.check {
+  color: green; /* Green for checkmark icon */
+}
+
+
+.edit-mode-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Space between label and toggle */
+}
+
+.edit-mode-toggle-label {
+  font-size: 1rem;
+}
+
+.edit-mode-toggle-switch {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  background: #ccc;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.edit-mode-toggle-switch::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+}
+
+.edit-mode-toggle-switch.active {
+  background: #4caf50; /* Green when active */
+}
+
+.edit-mode-toggle-switch.active::before {
+  transform: translateX(20px);
+}
+
+button {
+  background-color: #007bff; /* Modern blue */
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
