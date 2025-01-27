@@ -20,11 +20,6 @@
         <ul id="locations-list"></ul>
       </div>
       
-      <div id="add-location-container" class="hidden">
-        <input type="text" id="new-location-name" placeholder="New Location Name">
-        <button id="confirm-add-location" class="icon-btn check"><i class="fas fa-check"></i></button>
-
-      </div>
       <div class="file-actions">
 
   <div class="notebook-dropdown">
@@ -99,21 +94,20 @@
       </div>
       <div class="creatures-list" id="creatures-list-div">
         <ul id="creatures-list"></ul>
-        <div id="add-creature-container" class="hidden">
-          <input type="text" id="new-creature-name" placeholder="New Creature Name">
-          <button id="confirm-add-creature" class="icon-btn check"><i class="fas fa-check"></i></button>
-        </div>
       </div>
       <div class="statblock" id="statblock" style = "display:block">
         <div>
-          <button id="edit-statblock" class="edit-mode icon-btn edit" class="hidden"></button>
-          <button id="confirm-statblock" class="hidden icon-btn check"></button>
+          <button id="edit-statblock" class="edit-mode icon-btn edit">          <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button id="confirm-statblock" class="hidden icon-btn check">          <i class="fas fa-check"></i>
+          </button>
         </div>
         <div id="statblock-content">Select a creature to see details</div>
         <textarea id="statblock-edit-content" class="hidden"></textarea>
       </div>
     </div>
   </div>
+  <script src="shared.js"></script>
   <script src="main.js"></script>
   <script src="initiative-tracker.js"></script>
   <script src="notebook.js"></script>
@@ -121,6 +115,8 @@
   <script src="encounters.js"></script>
   <script src="locations.js"></script>
   <script src="ui-helpers.js"></script>
+  <script src="statblock.js"></script>
+  
 </body>
 </html>
 

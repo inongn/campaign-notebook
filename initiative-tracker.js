@@ -5,7 +5,7 @@ const initiativeTrackerGrid = document.getElementById("initiative-tracker-grid")
 const addRowButton = document.getElementById("add-row");
 
 // Initialize the tracker with a default number of rows
-function initializeTracker(rows) {
+function initializeTracker(rows=1) {
   for (let i = 0; i < rows; i++) {
     addRow();
   }
