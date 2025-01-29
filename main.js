@@ -1,5 +1,7 @@
 // Main Initialization
 window.addEventListener("DOMContentLoaded", initializeApp);
+let undoStack = [];
+let redoStack = [];
 
 function initializeApp() {
   // Handles overall app setup on page load
@@ -11,10 +13,6 @@ function initializeApp() {
 function bindGlobalEventListeners() {
   // Sets up event listeners for global actions
 
-  // Save notebook button
-  document.getElementById("save-notebook").addEventListener("click", () => {
-    saveAllNotebooks(); // notebook.js
-  });
 
   // Edit mode toggle
   document.getElementById("edit-mode-toggle").addEventListener("change", (e) => {
@@ -65,4 +63,57 @@ function bindGlobalEventListeners() {
 
   // YAML Export button
   document.getElementById("save-yaml").addEventListener("click", exportYAML); // notebook.js
+
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.key === "z") {
+      e.preventDefault();
+      undo();
+    } else if (e.ctrlKey && e.key === "y") {
+      e.preventDefault();
+      redo();
+    }
+  });
 }
+
+// Save the current state to the undo stack
+function saveState() {
+  undoStack.push(structuredClone(notebook)); // Save a deep copy of the notebook
+  redoStack = []; // Clear redo stack on new change
+}
+
+// Undo the last action
+function undo() {
+  if (undoStack.length > 0) {
+    redoStack.push(structuredClone(notebook)); // Save current state to redo stack
+    notebook = undoStack.pop(); // Restore the last state
+    refreshUI();
+    showNotification("Undo performed.");
+  } else {
+    showNotification("Nothing to undo.");
+  }
+}
+
+// Redo the last undone action
+function redo() {
+  if (redoStack.length > 0) {
+    undoStack.push(JSON.stringify(notebook)); // Save current state to undo stack
+    notebook = JSON.parse(redoStack.pop()); // Restore the next state
+    refreshUI(); // Update the UI to reflect the restored state
+    showNotification("Redo performed.");
+  } else {
+    showNotification("Nothing to redo.");
+  }
+}
+
+document.addEventListener("keydown", (e) => {
+  // Check for "Ctrl+E"
+  if (e.ctrlKey && e.key.toLowerCase() === "e") {
+    e.preventDefault(); // Prevent the default browser behavior
+
+    const editModeToggle = document.getElementById("edit-mode-toggle");
+    if (editModeToggle) {
+      editModeToggle.checked = !editModeToggle.checked; // Toggle the checkbox state
+      toggleEditMode(editModeToggle.checked); // Call the toggleEditMode function
+    }
+  }
+});

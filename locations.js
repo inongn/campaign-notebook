@@ -9,7 +9,12 @@ function populateLocations() {
     const locationItem = document.createElement("li");
     
     locationItem.className = "location-item";
-    locationItem.innerHTML = `<strong>${location.name}</strong>`;
+
+    // Create a container for the location header (draggable area)
+    const locationHeader = document.createElement("div");
+    locationHeader.className = "location-header"; // Add a class for styling
+    locationHeader.innerHTML = `<strong>${location.name}</strong>`;
+    locationItem.appendChild(locationHeader);
 
     // Add "+" and "-" buttons
     const addEncounterBtn = document.createElement("button");
@@ -19,7 +24,7 @@ function populateLocations() {
     addEncounterBtn.classList.add("hidden");
     addEncounterBtn.innerHTML = `<i class="fas fa-plus"></i>`;
     addEncounterBtn.addEventListener("click", () => showAddEncounterField(locationIdx));
-    locationItem.appendChild(addEncounterBtn);
+    locationHeader.appendChild(addEncounterBtn);
 
     const removeLocationBtn = document.createElement("button");
     removeLocationBtn.classList.add("icon-btn");
@@ -28,7 +33,8 @@ function populateLocations() {
     removeLocationBtn.classList.add("hidden");
     removeLocationBtn.innerHTML = `<i class="fas fa-trash"></i>`;
     removeLocationBtn.addEventListener("click", () => deleteLocation(locationIdx));
-    locationItem.appendChild(removeLocationBtn);
+    locationHeader.appendChild(removeLocationBtn);
+
 
     // Attach event listener for selecting a location
     const encountersList = document.createElement("ul");
@@ -47,7 +53,7 @@ function populateLocations() {
       removeEncounterBtn.innerHTML = `<i class="fas fa-trash"></i>`;
       removeEncounterBtn.addEventListener("click", () => deleteEncounter(locationIdx, encounterIdx));
       encounterItem.appendChild(removeEncounterBtn);
-      
+
       encountersList.appendChild(encounterItem);
     });
 
@@ -66,10 +72,48 @@ function populateLocations() {
   addLocationButton.addEventListener("click", () => showAddLocationField());
   locationsList.appendChild(addLocationButton);
   
+// Enable SortableJS for locations
+ Sortable.create(locationsList, {
+    animation: 150,
+    handle: ".location-header", // Make the entire header area draggable
+    onStart: function () {
+      saveState(); // Save state before dragging begins
+    },
+    onEnd: function (evt) {
+      const [movedLocation] = notebook.locations.splice(evt.oldIndex, 1);
+      notebook.locations.splice(evt.newIndex, 0, movedLocation);
+      saveAllNotebooks(); // Save the new order
+      refreshUI(); // Update the UI
+    }
+  });
+
+// Enable SortableJS for encounters within each location
+notebook.locations.forEach((location, locationIdx) => {
+  const encountersList = document.querySelectorAll("#locations-list ul")[locationIdx];
+  if (encountersList) {
+    Sortable.create(encountersList, {
+      animation: 150,
+      handle: "li", // Make the entire <li> draggable for encounters
+      onStart: function () {
+        saveState(); // Save state before dragging begins
+      },
+      onEnd: function (evt) {
+        const [movedEncounter] = location.encounters.splice(evt.oldIndex, 1);
+        location.encounters.splice(evt.newIndex, 0, movedEncounter);
+        saveAllNotebooks(); // Save the new order
+        refreshUI(); // Update the UI
+      }
+    });
+  }
+});
+
+
   toggleEditMode(isEditMode);
 }
 
 function showAddLocationField() {
+  saveState();
+
   const locationsList = document.getElementById("locations-list");
   const addLocationContainer = document.createElement("div");
   addLocationContainer.innerHTML = `
@@ -95,6 +139,7 @@ function showAddLocationField() {
 }
 
 function showAddEncounterField(locationIdx) {
+  saveState();
   const locationsList = document.getElementById("locations-list");
   const addEncounterContainer = document.createElement("div");
   addEncounterContainer.innerHTML = `
@@ -122,6 +167,8 @@ function showAddEncounterField(locationIdx) {
 
 // Delete a location and its associated encounters
 function deleteLocation(locationId) {
+  saveState();
+
   const location = notebook.locations[locationId];
   if (!location) {
     showNotification("Invalid location ID."); // ui-helpers.js
@@ -136,6 +183,8 @@ function deleteLocation(locationId) {
 
 // Delete a location and its associated encounters
 function deleteEncounter(locationIdx, encounterIdx) {
+  saveState();
+
   const encounter = notebook.locations[locationIdx].encounters[encounterIdx];
   if (!encounter) {
     showNotification("Invalid location ID."); // ui-helpers.js

@@ -28,11 +28,15 @@ body {
   flex: 1;
   background-color: #f7f7f7;
   border-right: 1px solid #ddd;
+  scrollbar-width: none;
+
 }
 
 .middle {
   flex: 3;
   background-color: #fff;
+  scrollbar-width: none;
+
 }
 
 .right {
@@ -50,6 +54,7 @@ body {
   border: 1px solid #ddd;
   border-radius: 5px;
   background-color: #fff;
+  scrollbar-width: none;
 }
 
 /* Right column layout */
@@ -142,6 +147,10 @@ textarea {
 .statblock ul {
   margin-top: 1px;
   }
+
+#encounter-content{
+  line-height: 1.8;
+}
 
 /* Add bullets to markdown content list items */
 #encounter-content ul {
@@ -364,7 +373,7 @@ button.icon-btn.add {
   color: green; /* Green for "+" icon */
 }
 
-button.icon-btn.edit {
+button.icon-btn.edit, button.icon-btn.arrow {
   color: gray; /* Gray for pencil icon */
 }
 
@@ -429,4 +438,84 @@ button:hover {
 button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+.location-header {
+  display: block; /* Make it behave like a block element */
+  cursor: grab; /* Show the grab cursor */
+  padding: 0.5rem; /* Add some padding for better usability */
+}
+
+a {
+  text-decoration: none; 
+}
+
+.initiative-tracker-grid input {
+  transition: background-color 0.3s ease;
+}
+
+.tracker-btn {
+  color: blue;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.edit-mode-toggle {
+  display: flex;
+  align-items: center; /* Vertically aligns items */
+  gap: 10px; /* Adds space between text and the toggle */
+}
+
+.edit-mode-text {
+  margin: 0; /* Removes default margin from <p> to ensure proper alignment */
+}
+
+.switch {
+  display: inline-block;
+  height: 34px;
+  position: relative;
+  width: 60px;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  background-color: #ccc;
+  bottom: 0;
+  cursor: pointer;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: .4s;
+}
+
+.slider:before {
+  background-color: #fff;
+  bottom: 4px;
+  content: "";
+  height: 26px;
+  left: 4px;
+  position: absolute;
+  transition: .4s;
+  width: 26px;
+}
+
+input:checked + .slider {
+  background-color: #66bb6a;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }

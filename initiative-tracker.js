@@ -4,6 +4,22 @@
 const initiativeTrackerGrid = document.getElementById("initiative-tracker-grid");
 const addRowButton = document.getElementById("add-row");
 
+
+// Create the "active combatant" button in the header row
+const activeCombatantButton = document.createElement("button");
+activeCombatantButton.classList.add("icon-btn", "tracker-btn");
+activeCombatantButton.innerHTML = `<i class="fas fa-forward-step"></i>`;
+initiativeTrackerGrid.prepend(activeCombatantButton); // Add it to the beginning of the grid
+
+// Initialize active combatant index
+let activeCombatantIndex = -1;
+
+// Add click event listener for the active combatant button
+activeCombatantButton.addEventListener("click", () => {
+  highlightActiveCombatant();
+});
+
+
 // Initialize the tracker with a default number of rows
 function initializeTracker(rows=1) {
   for (let i = 0; i < rows; i++) {
@@ -33,6 +49,19 @@ function addRow(creature = null) {
         ac: creature.ac || ""
       }
     : defaultValues;
+
+  // Remove an empty row if a creature is provided
+  if (creature) {
+    const rows = Array.from(initiativeTrackerGrid.children).slice(5); // Skip header cells
+    for (let i = 0; i < rows.length; i += 5) { // Iterate over rows (5 cells per row)
+      const row = rows.slice(i, i + 5);
+      const isEmpty = row.slice(0, 4).every((cell) => cell.value.trim() === "");
+      if (isEmpty) {
+        row.forEach((cell) => cell.remove()); // Remove the row
+        break; // Only remove the first empty row
+      }
+    }
+  }
 
   // Add a new row with the creature's data
   Object.values(creatureValues).forEach((value, index) => {
@@ -78,6 +107,7 @@ function addRow(creature = null) {
   // Sort rows after adding the new creature
   sortTrackerRows();
 }
+
 
 // Function to remove a combatant row
 function removeCombatantRow(button) {
@@ -126,3 +156,28 @@ initiativeTrackerGrid.addEventListener("input", (e) => {
     sortTimeout = setTimeout(() => sortTrackerRows(), 300); // Debounce sorting
   }
 });
+
+function highlightActiveCombatant() {
+  const rows = Array.from(initiativeTrackerGrid.children).slice(5); // Skip header cells
+  const combatantRows = [];
+
+  // Group rows into sets of 5 (4 inputs + 1 button per combatant)
+  for (let i = 0; i < rows.length; i += 5) {
+    combatantRows.push(rows.slice(i, i + 5));
+  }
+
+  // Remove highlight from all rows
+  combatantRows.forEach((row) => {
+    row.forEach((cell) => {
+      cell.style.backgroundColor = ""; // Reset background color
+    });
+  });
+
+  // Move to the next combatant
+  activeCombatantIndex = (activeCombatantIndex + 1) % combatantRows.length;
+
+  // Highlight the current combatant row
+  combatantRows[activeCombatantIndex].forEach((cell) => {
+    cell.style.backgroundColor = "#F3F3F3";
+  });
+}

@@ -16,6 +16,30 @@ const defaultNotebook = {
               name: "Goblin Scout",
               hp: 12,
               ac: 13,
+              initiative: 2,
+              size: "Small",
+              type: "Humanoid (Goblinoid)",
+              alignment: "Neutral Evil",
+              skills: {
+                Stealth: 6,
+              },
+              senses: [
+                "Darkvision 60 ft.",
+                "Passive Perception 9"
+              ],
+              languages: [
+                "Common",
+                "Goblin"
+              ],
+              challange_rating: "1/4 (50 XP)", 
+              ability_scores: {
+                STR: 9,
+                DEX: 14,
+                CON: 12,
+                INT: 10,
+                WIS: 9,
+                CHA: 7
+              },
               ability_score_modifiers: {
                 STR: -1,
                 DEX: 2,
@@ -24,6 +48,7 @@ const defaultNotebook = {
                 WIS: -1,
                 CHA: -2
               },
+              
               features: [
                 {
                   name: "Nimble Escape",
@@ -40,7 +65,6 @@ const defaultNotebook = {
                   description: "Ranged Weapon Attack: +4 to hit, range 80/320 ft., one target. Hit: 5 (1d6+2) piercing damage."
                 }
               ],
-              legendary_actions: []
             }
           ]
         }
@@ -76,7 +100,9 @@ function setActiveNotebook(notebookId) {
   if (notebooks && notebooks[notebookId]) {
     notebook = notebooks[notebookId];
     populateLocations(); // Update the UI to reflect the active notebook
+    if (notebook.locations[0].encounters[0]) {
     populateEncounter(notebook.locations[0].encounters[0]);
+  }
 
   } else {
     createDefaultNotebook(); // If no valid notebook found, create a default one
@@ -182,7 +208,6 @@ function exportYAML() {
 
     showNotification(`Notebook "${notebook.name}" exported successfully.`); // ui-helpers.js
   } catch (error) {
-    console.error("Error exporting notebook as YAML:", error);
     showNotification("Failed to export notebook. Please try again."); // ui-helpers.js
   }
 }
@@ -220,7 +245,6 @@ function importYAML() {
       updateNotebookDropdown(); // Refresh the dropdown
       setActiveNotebook(newNotebookId); // Set the imported notebook as active
     } catch (error) {
-      console.error("Error importing YAML file:", error);
       showNotification("Failed to import notebook. Please ensure the file is valid."); // ui-helpers.js
     }
   });

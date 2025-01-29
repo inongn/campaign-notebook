@@ -3,11 +3,13 @@
 <head>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>D&D Campaign Tracker</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v0.1">
   <link href="test.yaml">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
@@ -29,7 +31,6 @@
     </select>
   </div>
   
-  <button id="save-notebook">Save</button>
   <button id="delete-notebook">Delete</button>
   <button id="rename-notebook">Rename</button>
 
@@ -53,11 +54,16 @@
 
   
 </div>
-<div class="edit-mode-toggle">
-  <label>
-    <input type="checkbox" id="edit-mode-toggle"> Edit Mode
+<div class="edit-mode-toggle container">
+  <p class="edit-mode-text">Edit Mode</p>
+  <label class="switch" for="edit-mode-toggle">
+    <input type="checkbox" id="edit-mode-toggle">
+    <div class="slider round"></div>
   </label>
 </div>
+
+
+
 
     </div>
 
@@ -80,7 +86,7 @@
       <div class="initiative-tracker">
 <div id="initiative-tracker-grid" class="initiative-tracker-grid">
   <!-- Header Row -->
-  <div>#</div>
+
   <div>Name</div>
   <div>HP</div>
   <div>AC</div>
@@ -107,15 +113,15 @@
       </div>
     </div>
   </div>
-  <script src="shared.js"></script>
-  <script src="main.js"></script>
-  <script src="initiative-tracker.js"></script>
-  <script src="notebook.js"></script>
-  <script src="creatures.js"></script>
-  <script src="encounters.js"></script>
-  <script src="locations.js"></script>
-  <script src="ui-helpers.js"></script>
-  <script src="statblock.js"></script>
+  <script src="shared.js?v0.1"></script>
+  <script src="main.js?v0.1"></script>
+  <script src="initiative-tracker.js?v0.1"></script>
+  <script src="notebook.js?v0.1"></script>
+  <script src="creatures.js?v0.1"></script>
+  <script src="encounters.js?v0.1"></script>
+  <script src="locations.js?v0.1"></script>
+  <script src="ui-helpers.js?v0.1"></script>
+  <script src="statblock.js?v0.1"></script>
   
 </body>
 </html>

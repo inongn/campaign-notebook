@@ -84,3 +84,38 @@ function toggleEditMode(isEditMode) {
     }, 3000);
   }
   
+  function refreshUI() {
+    // Get references to the currently displayed encounter and statblock
+    const currentEncounterName = activeEncounter?.name || null;
+    const currentCreatureIndex = activeEncounter?.creatures.findIndex(creature =>
+      creature.name === document.querySelector("#statblock-content h4")?.textContent
+    ) || null;
+  
+    // Refresh the locations list
+    populateLocations();
+  
+    // Refresh the currently displayed encounter if it exists
+    if (currentEncounterName) {
+      const matchingEncounter = notebook.locations.flatMap(location => location.encounters)
+        .find(encounter => encounter.name === currentEncounterName);
+      if (matchingEncounter) {
+        activeEncounter = matchingEncounter; // Update activeEncounter
+        populateEncounter(matchingEncounter);
+      } else {
+        activeEncounter = null; // Reset if the encounter no longer exists
+      }
+    }
+  
+    // Refresh the currently displayed statblock if it exists
+    if (currentCreatureIndex !== null && currentCreatureIndex >= 0) {
+      const matchingCreature = activeEncounter?.creatures[currentCreatureIndex];
+      if (matchingCreature) {
+        populateStatblock(matchingCreature); // Use the updated function name
+      } else {
+        // Clear statblock if the creature no longer exists
+        document.getElementById("statblock-content").innerHTML = "No creature selected.";
+      }
+    }
+  }
+  
+  

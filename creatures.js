@@ -66,6 +66,8 @@ function populateCreatures(encounter) {
   }
 
   function showAddCreatureField(encounter) {
+    saveState();
+
     const creaturesList = document.getElementById("creatures-list");
     const addCreatureContainer = document.createElement("div");
     addCreatureContainer.innerHTML = `
@@ -79,10 +81,20 @@ function populateCreatures(encounter) {
     const confirmAddCreatureBtn = document.getElementById(`confirm-add-creature`);
     confirmAddCreatureBtn.addEventListener("click", () => {
       const newCreatureName = document.getElementById(`new-creature-name`).value;
+
       creaturePos = encounter.creatures.push({
         name: newCreatureName,
         hp: 10, // Default HP
         ac: 10, // Default AC
+        initiative: 0,
+        ability_scores:{
+          STR: 10,
+          DEX: 10,
+          CON: 10,
+          INT: 10,
+          WIS: 10,
+          CHA: 10,
+        },
         ability_score_modifiers: {
           STR: 0,
           DEX: 0,
@@ -93,7 +105,6 @@ function populateCreatures(encounter) {
         },
         features: [],
         actions: [],
-        legendary_actions: [],
     });
       saveAllNotebooks(); // notebook.js
       populateCreatures(encounter);
@@ -105,6 +116,8 @@ function populateCreatures(encounter) {
 
 // Delete a location and its associated encounters
 function deleteCreature(creature, encounter, creatureIdx) {
+  saveState();
+
   encounter.creatures.splice(creatureIdx, 1); // Remove the location
   saveAllNotebooks(); // notebook.js
   populateLocations(); // Refresh the UI with the updated locations
@@ -113,12 +126,14 @@ function deleteCreature(creature, encounter, creatureIdx) {
 }
 
 function addCreatureToInitiative(creature) {
+  saveState();
+
   const roll = Math.floor(Math.random() * 20) + 1; // Roll a d20
-  const modifier = creature.ability_score_modifiers.DEX || 0; // DEX modifier
+  const modifier = creature.initiative || 0; // DEX modifier
   const initiative = roll + modifier;
 
   // Show the initiative roll in the dice roller popup
-  showPopup(`Initiative Roll: d20 (${roll}) + DEX (${modifier}) = ${initiative}`);
+  showPopup(`Initiative Roll: d20 (${roll}) + (${modifier}) = ${initiative}`);
 
   // Add the creature to the tracker
   addRow({
