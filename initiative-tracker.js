@@ -1,183 +1,115 @@
-// initiative-tracker.js
+document.addEventListener("DOMContentLoaded", initializeInitiativeTracker);
 
-// DOM Elements
-const initiativeTrackerGrid = document.getElementById("initiative-tracker-grid");
-const addRowButton = document.getElementById("add-row");
-
-
-// Create the "active combatant" button in the header row
-const activeCombatantButton = document.createElement("button");
-activeCombatantButton.classList.add("icon-btn", "tracker-btn");
-activeCombatantButton.innerHTML = `<i class="fas fa-forward-step"></i>`;
-initiativeTrackerGrid.prepend(activeCombatantButton); // Add it to the beginning of the grid
-
-// Initialize active combatant index
-let activeCombatantIndex = -1;
-
-// Add click event listener for the active combatant button
-activeCombatantButton.addEventListener("click", () => {
-  highlightActiveCombatant();
-});
-
-
-// Initialize the tracker with a default number of rows
-function initializeTracker(rows=1) {
-  for (let i = 0; i < rows; i++) {
-    addRow();
+function initializeInitiativeTracker() {
+  for (let i = 0; i < 4; i++) {
+      addCombatantRow();
   }
 
-  // Attach event listeners for adding rows
-  addRowButton.addEventListener("click", () => addRow());
+  document.getElementById("add-combatant-row-button").addEventListener("click", function () {
+    addCombatantRow();
+  });
+
+  document.getElementById("next-combatant-button").addEventListener("click", function () {
+    NextCombatant();
+  });
 }
 
-// Function to add a new combatant row
-function addRow(creature = null) {
-  // Default values for manual row addition
-  const defaultValues = {
-    initiative: "",
-    name: "",
-    hp: "",
-    ac: ""
-  };
-
-  // Use creature values if provided, otherwise use default values
-  const creatureValues = creature
-    ? {
-        initiative: creature.initiative || "",
-        name: creature.name || "",
-        hp: creature.hp || "",
-        ac: creature.ac || ""
-      }
-    : defaultValues;
-
-  // Remove an empty row if a creature is provided
-  if (creature) {
-    const rows = Array.from(initiativeTrackerGrid.children).slice(5); // Skip header cells
-    for (let i = 0; i < rows.length; i += 5) { // Iterate over rows (5 cells per row)
-      const row = rows.slice(i, i + 5);
-      const isEmpty = row.slice(0, 4).every((cell) => cell.value.trim() === "");
-      if (isEmpty) {
-        row.forEach((cell) => cell.remove()); // Remove the row
-        break; // Only remove the first empty row
-      }
+function addCombatantRow(initiative = "", name = "", hp = "", ac = "") {
+  const trackerContent = document.getElementById("initiative-tracker-content");
+  let finalInitiative = "";
+  if (initiative !== "")
+    { 
+  // Remove any row that has an empty input field
+  const existingRows = trackerContent.getElementsByClassName("initiative-tracker-combatant-row");
+  for (let i = existingRows.length - 1; i >= 0; i--) {
+    const inputs = existingRows[i].getElementsByTagName("input");
+    if ([...inputs].some(input => input.value.trim() === "")) {
+      trackerContent.removeChild(existingRows[i]);
+      break;
     }
   }
 
-  // Add a new row with the creature's data
-  Object.values(creatureValues).forEach((value, index) => {
+  // Calculate initiative value
+  const randomRoll = Math.floor(Math.random() * 20) + 1; // Random number between 1 and 20
+  finalInitiative = initiative ? randomRoll + parseInt(initiative, 10) : randomRoll;
+  }
+
+  // Create a new combatant row
+  const newRow = document.createElement("div");
+  newRow.classList.add("initiative-tracker-combatant-row");
+
+  // Create and append input fields
+  const inputs = [finalInitiative, name, hp, ac];
+  inputs.forEach((value, index) => {
     const input = document.createElement("input");
     input.type = "text";
     input.value = value;
-
-    // Add functionality to the HP column (3rd cell) to solve arithmetic expressions
-    if (index === 2) {
-      input.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-          const expression = input.value.trim();
-          try {
-            // Evaluate the arithmetic expression
-            const result = eval(expression);
-            if (!isNaN(result)) {
-              input.value = result; // Replace the expression with its result
-            } else {
-              throw new Error("Invalid expression");
-            }
-          } catch (err) {
-            showNotification("Invalid arithmetic expression."); // Notify user of invalid input
-          }
-        }
-      });
-    }
-
-    initiativeTrackerGrid.appendChild(input);
-  });
-
-  // Add the "Remove" button at the end of the row
-  const removeButton = document.createElement("button");
-  removeButton.classList.add("icon-btn", "trash"); // Add the "trash" style
-  removeButton.innerHTML = `<i class="fas fa-trash"></i>`;
-  
-  // Remove the entire row when clicked
-  removeButton.addEventListener("click", () => {
-    removeCombatantRow(removeButton);
-  });
-
-  initiativeTrackerGrid.appendChild(removeButton);
-
-  // Sort rows after adding the new creature
-  sortTrackerRows();
-}
-
-
-// Function to remove a combatant row
-function removeCombatantRow(button) {
-  // Find the index of the row containing the clicked button
-  const allCells = Array.from(initiativeTrackerGrid.children);
-  const buttonIndex = allCells.indexOf(button);
-
-  // Remove the entire row (5 elements: 4 inputs + 1 button)
-  for (let i = 0; i < 5; i++) {
-    allCells[buttonIndex - (4 - i)].remove();
-  }
-}
-
-// Function to sort rows by initiative (#) column
-function sortTrackerRows() {
-  const combatantCells = Array.from(initiativeTrackerGrid.children).slice(5); // Skip header cells
-
-  // Group combatant cells into rows of 5 (4 inputs + 1 button per row)
-  const rows = [];
-  for (let i = 0; i < combatantCells.length; i += 5) {
-    rows.push(combatantCells.slice(i, i + 5));
-  }
-
-  // Sort rows by the value in the first cell (# column)
-  rows.sort((a, b) => {
-    const aValue = parseInt(a[0].value) || 0;
-    const bValue = parseInt(b[0].value) || 0;
-    return bValue - aValue; // Descending order
-  });
-
-  // Reattach sorted rows to the grid without disrupting focus
-  const activeElement = document.activeElement; // Save the focused element
-  rows.forEach((row) => {
-    row.forEach((cell) => initiativeTrackerGrid.appendChild(cell));
-  });
-  activeElement.focus(); // Restore focus
-}
-
-// Debounce timer for sorting
-let sortTimeout;
-
-// Attach sorting on input changes
-initiativeTrackerGrid.addEventListener("input", (e) => {
-  if (e.target.closest("input")) {
-    clearTimeout(sortTimeout); // Clear previous timer
-    sortTimeout = setTimeout(() => sortTrackerRows(), 300); // Debounce sorting
-  }
-});
-
-function highlightActiveCombatant() {
-  const rows = Array.from(initiativeTrackerGrid.children).slice(5); // Skip header cells
-  const combatantRows = [];
-
-  // Group rows into sets of 5 (4 inputs + 1 button per combatant)
-  for (let i = 0; i < rows.length; i += 5) {
-    combatantRows.push(rows.slice(i, i + 5));
-  }
-
-  // Remove highlight from all rows
-  combatantRows.forEach((row) => {
-    row.forEach((cell) => {
-      cell.style.backgroundColor = ""; // Reset background color
+    input.addEventListener("blur", function () {
+      evaluateExpression(input);
+      sortCombatantRows(); // Trigger sorting after input loses focus
     });
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        input.blur(); // Deselect input on Enter key press
+      }
+    });
+    newRow.appendChild(input);
   });
 
-  // Move to the next combatant
-  activeCombatantIndex = (activeCombatantIndex + 1) % combatantRows.length;
-
-  // Highlight the current combatant row
-  combatantRows[activeCombatantIndex].forEach((cell) => {
-    cell.style.backgroundColor = "#F3F3F3";
+  // Add delete button
+  const deleteButton = document.createElement("button");
+  deleteButton.classList.add("icon-btn");
+  deleteButton.innerHTML = '<i class="fas fa-x"></i>';
+  deleteButton.addEventListener("click", function () {
+    trackerContent.removeChild(newRow);
+    sortCombatantRows(); // Re-sort after deletion
   });
+  newRow.appendChild(deleteButton);
+
+  // Append the new row to the tracker content
+  trackerContent.appendChild(newRow);
+  sortCombatantRows();
+}
+
+
+function evaluateExpression(input) {
+  try {
+      const result = new Function('return ' + input.value)();
+      if (!isNaN(result)) {
+          input.value = result;
+      }
+  } catch (e) {
+      // Ignore errors and keep the input as is
+  }
+}
+
+function sortCombatantRows() {
+  const trackerContent = document.getElementById("initiative-tracker-content");
+  const rows = Array.from(trackerContent.getElementsByClassName("initiative-tracker-combatant-row"));
+
+  rows.sort((a, b) => {
+      const initiativeA = parseInt(a.getElementsByTagName("input")[0].value) || 0;
+      const initiativeB = parseInt(b.getElementsByTagName("input")[0].value) || 0;
+      return initiativeB - initiativeA; // Sort descending (highest first)
+  });
+
+  rows.forEach(row => trackerContent.appendChild(row));
+}
+
+function NextCombatant(){
+  const rows = Array.from(document.getElementsByClassName("initiative-tracker-combatant-row"));
+  const activeIndex = rows.findIndex(row => row.classList.contains("active-row"));
+
+  if (activeIndex === -1) {
+      // No active row, set the first row as active
+      if (rows.length > 0) {
+          rows[0].classList.add("active-row");
+      }
+  } else {
+      // Remove active class from current row
+      rows[activeIndex].classList.remove("active-row");
+      // Move to the next row or wrap back to the first
+      const nextIndex = (activeIndex + 1) % rows.length;
+      rows[nextIndex].classList.add("active-row");
+  }
 }

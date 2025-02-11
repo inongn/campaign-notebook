@@ -1,167 +1,105 @@
-// Encounter Management
 
-function populateEncounter(encounter) {
-  activeEncounter = encounter; // Update the active encounter
-  const encounterName = document.getElementById("encounter-name");
-  const encounterContent = document.getElementById("encounter-content");
-  const editButton = document.getElementById("edit-encounter");
-  const confirmButton = document.getElementById("confirm-edit-encounter");
-  const encounterEditTextArea = document.getElementById("encounter-edit-content");
+//make dice rollable
+function processHtmlContent(htmlContent) {
+    const dicePattern = /(\d+d\d+(?:[+-]\d+)?|[+-]\d+)/g;
+    
 
-  // Set the encounter name
-  encounterName.textContent = encounter.name;
-
-  // Step 1: Render the content using Marked.js to apply Markdown
-  const renderedMarkdown = marked.parse(encounter.content);
-
-  // Step 2: Process the rendered Markdown for cross-notebook links
-  encounterContent.innerHTML = generateLinkedContent(renderedMarkdown);
-
-  // Populate the creatures for this encounter
-  populateCreatures(encounter); // Pass the active encounter
-
-  // Automatically load the first creature into the statblock
-  if (encounter.creatures.length > 0) {
-    populateStatblock(encounter.creatures[0],encounter);
-  }
-
-  // Reset buttons visibility
-  confirmButton.classList.add("hidden");
-  encounterEditTextArea.classList.add("hidden");
-  encounterContent.classList.remove("hidden");
-
-  // Attach edit functionality
-  editButton.onclick = () => enableMarkdownEditor(encounter);
-}
-
-
-// Enable markdown editing for encounter content
-function enableMarkdownEditor(encounter) {
-  const editButton = document.getElementById("edit-encounter");
-  const confirmButton = document.getElementById("confirm-edit-encounter");
-  const encounterContent = document.getElementById("encounter-content");
-  const encounterEditTextArea = document.getElementById("encounter-edit-content");
-
-  // Switch to edit mode
-  editButton.classList.add("hidden");
-  confirmButton.classList.remove("hidden");
-  encounterContent.classList.add("hidden");
-  encounterEditTextArea.classList.remove("hidden");
-  encounterEditTextArea.value = encounter.content;
-
-  // Add keyboard shortcuts for markdown formatting (if not already added)
-  if (!encounterEditTextArea.dataset.listenerAdded) {
-    encounterEditTextArea.dataset.listenerAdded = true; // Mark as added
-    encounterEditTextArea.addEventListener("keydown", (e) => {
-      if (e.ctrlKey && e.key === "b") {
-        e.preventDefault(); // Prevent the default behavior
-        wrapSelectedText(encounterEditTextArea, "**"); // Add ** for bold
-      } else if (e.ctrlKey && e.key === "i") {
-        e.preventDefault(); // Prevent the default behavior
-        wrapSelectedText(encounterEditTextArea, "*"); // Add * for italics
-      }
+    
+    htmlContent = htmlContent.replace(dicePattern, match => {
+        return `<span class="rollable" onclick="rollDice('${match}')">${match}</span>`;
     });
-  }
-
-  // Clear existing listeners to avoid stacking
-  confirmButton.replaceWith(confirmButton.cloneNode(true));
-  const newConfirmButton = document.getElementById("confirm-edit-encounter");
-
-  // Handle confirming the edit
-  newConfirmButton.addEventListener("click", () => {
-    saveState();
-
-    encounter.content = encounterEditTextArea.value;
-    // Step 1: Render the content using Marked.js to apply Markdown
-    const renderedMarkdown = marked.parse(encounter.content);
-
-    // Step 2: Process the rendered Markdown for cross-notebook links
-    encounterContent.innerHTML = generateLinkedContent(renderedMarkdown);
-    newConfirmButton.classList.add("hidden");
-    editButton.classList.remove("hidden");
-    encounterContent.classList.remove("hidden");
-    encounterEditTextArea.classList.add("hidden");
-    saveAllNotebooks(); // notebook.js
-  });
+    
+    return htmlContent;
 }
+function rollDice(expression) {
+    let match = expression.match(/(\d*)d(\d+)([+-]\d+)?/);
+    let message = '';
 
-  // Helper function to wrap selected text with markdown symbols
-  function wrapSelectedText(textArea, wrapper) {
-    const start = textArea.selectionStart;
-    const end = textArea.selectionEnd;
-    const selectedText = textArea.value.substring(start, end);
-  
-    // Wrap the selected text
-    const before = textArea.value.substring(0, start);
-    const after = textArea.value.substring(end);
-    textArea.value = `${before}${wrapper}${selectedText}${wrapper}${after}`;
-  
-    // Restore selection to include the wrapping
-    textArea.setSelectionRange(start + wrapper.length, end + wrapper.length);
-    textArea.focus();
-  }
-  
+    if (match) {
+        let rolls = parseInt(match[1] || '1', 10);
+        let sides = parseInt(match[2], 10);
+        let modifier = match[3] ? parseInt(match[3], 10) : 0;
+        let total = modifier;
+        let rollResults = [];
 
-  function generateLinkedContent(content) {
-    // Iterate through all locations, encounters, and creatures to find matches
-    notebook.locations.forEach((location) => {
-      location.encounters.forEach((encounter) => {
-        // Link to encounter
-        const encounterRegex = new RegExp(`\\b${encounter.name}\\b`, "g");
-        content = content.replace(encounterRegex, (match) => {
-          return `<a href="#" class="link" data-type="encounter" data-name="${encounter.name}">${match}</a>`;
-        });
-  
-        // Link to creatures
-        encounter.creatures.forEach((creature) => {
-          const creatureRegex = new RegExp(`\\b${creature.name}\\b`, "g");
-          content = content.replace(creatureRegex, (match) => {
-            return `<a href="#" class="link" data-type="creature" data-name="${creature.name}">${match}</a>`;
-          });
-        });
-      });
-    });
-  
-    // Add event listeners to the generated links
-    setTimeout(() => {
-      const links = document.querySelectorAll(".link");
-      links.forEach((link) => {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const type = link.getAttribute("data-type");
-          const name = link.getAttribute("data-name");
-  
-          if (type === "encounter") {
-            const encounter = findEncounterByName(name);
-            if (encounter) populateEncounter(encounter);
-          } else if (type === "creature") {
-            const creature = findCreatureByName(name);
-            if (creature) populateStatblock(creature);
-          }
-        });
-      });
-    }, 0);
-  
-    return content;
-  }
-  
-  function findEncounterByName(name) {
-    for (const location of notebook.locations) {
-      for (const encounter of location.encounters) {
-        if (encounter.name === name) return encounter;
-      }
-    }
-    return null; // Return null if no match is found
-  }
-  
-  function findCreatureByName(name) {
-    for (const location of notebook.locations) {
-      for (const encounter of location.encounters) {
-        for (const creature of encounter.creatures) {
-          if (creature.name === name) return creature;
+        for (let i = 0; i < rolls; i++) {
+            let roll = Math.floor(Math.random() * sides) + 1;
+            rollResults.push(roll);
+            total += roll;
         }
-      }
+
+        message = `${expression}: ${total}`; // Replace this line
+    } else {
+        match = expression.match(/([+-]\d+)/);
+        if (match) {
+            let modifier = parseInt(match[1], 10);
+            let roll = Math.floor(Math.random() * 20) + 1;
+            total = roll + modifier;
+            message = `1d20${modifier >= 0 ? '+' : ''}${modifier}: ${total}`; // Replace this line
+        } else {
+            message = "Invalid dice expression!";
+        }
     }
-    return null; // Return null if no match is found
-  }
-  
+
+    showSnackbar(message);
+}
+
+let snackbarTimeout; // Store timeout globally
+
+function showSnackbar(message) {
+    let snackbar = document.getElementById("snackbar");
+    snackbar.innerText = message;
+    snackbar.classList.add("show");
+
+    // Clear previous timeout before setting a new one
+    clearTimeout(snackbarTimeout);
+    
+    snackbarTimeout = setTimeout(() => {
+        snackbar.classList.remove("show");
+    }, 3000);
+}
+
+function rollInitiative(content){
+    extractCombatantStats(content);
+    openRight();
+}
+
+function extractCombatantStats(markdownText) {
+    let nameMatch = markdownText.match(/^#{1,}\s*(.+)$/m);
+    let name = nameMatch ? nameMatch[1] : "Unknown";    
+
+    let acMatch = markdownText.match(/\*\*Armor Class\*\*\s*(\d+)/);
+    let armorClass = acMatch ? parseInt(acMatch[1], 10) : 0;
+
+    let hpMatch = markdownText.match(/\*\*Hit Points\*\*\s*(\d+)/);
+    let hitPoints = hpMatch ? parseInt(hpMatch[1], 10) : 0;
+
+    // Match the ability score table row values
+    let abilityMatch = markdownText.match(/\|\s*(\d+)\s*\(\s*([-+]\d+)\s*\)\s*\|\s*(\d+)\s*\(\s*([-+]\d+)\s*\)\s*\|\s*(\d+)\s*\(\s*([-+]\d+)\s*\)\s*\|\s*(\d+)\s*\(\s*([-+]\d+)\s*\)\s*\|\s*(\d+)\s*\(\s*([-+]\d+)\s*\)\s*\|\s*(\d+)\s*\(\s*([-+]\d+)\s*\)\s*\|/);
+
+    let dexModifier = abilityMatch ? parseInt(abilityMatch[4], 10) : 0; // Correctly selecting the 2nd stat (DEX)
+
+    console.log (dexModifier,name,hitPoints,armorClass);
+    addCombatantRow(dexModifier,name,hitPoints,armorClass);
+}
+
+
+function openRight(){
+    const left = document.getElementById("left");
+    const right = document.getElementById("right");
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth <= 1000) {
+        // If screen width is 992px or less, close left sidebar before toggling right
+        if (left.classList.contains("active")) {
+            left.classList.remove("active");
+        }
+    }
+
+    right.classList.add("active");
+
+    // Only call repositionMiddle if screen width is greater than 992
+    if (screenWidth > 705) {
+        repositionMiddle();
+    }
+}

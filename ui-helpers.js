@@ -1,121 +1,143 @@
-// User Interface Helpers
+// Middle position helpers
 
-function showNotification(message) {
-  // Displays a temporary notification in the UI
-  const notificationArea = document.getElementById("notification-area");
+document.addEventListener("DOMContentLoaded", () => {
+  const screenWidth = window.innerWidth;
 
-  // Create a notification message element
-  const notification = document.createElement("div");
-  notification.className = "notification-message";
-  notification.textContent = message;
-
-  // Add the notification to the notification area
-  notificationArea.appendChild(notification);
-
-  // Remove the notification after 3 seconds
-  setTimeout(() => {
-    notification.remove();
-  }, 3000);
-
+  if (screenWidth > 705) {
+    repositionMiddle();
 }
+});
 
-function showModal({ message, showInput = false, onConfirm }) {
-  // Displays a modal dialog with optional input
-
-  const modalContainer = document.getElementById("modal-container");
-  const modalMessage = document.getElementById("modal-message");
-  const modalInput = document.getElementById("modal-input");
-  const confirmButton = document.getElementById("modal-confirm");
-  const cancelButton = document.getElementById("modal-cancel");
-
-  modalMessage.textContent = message;
-  modalInput.value = "";
-  modalInput.classList.toggle("hidden", !showInput);
-
-  modalContainer.classList.remove("hidden");
-
-  // Confirm action
-  const handleConfirm = () => {
-    modalContainer.classList.add("hidden");
-    const inputValue = showInput ? modalInput.value.trim() : null;
-    if (onConfirm) onConfirm(inputValue);
-    cleanup();
-  };
-
-  // Cancel action
-  const handleCancel = () => {
-    modalContainer.classList.add("hidden");
-    cleanup();
-  };
-
-  // Cleanup event listeners
-  const cleanup = () => {
-    confirmButton.removeEventListener("click", handleConfirm);
-    cancelButton.removeEventListener("click", handleCancel);
-  };
-
-  confirmButton.addEventListener("click", handleConfirm);
-  cancelButton.addEventListener("click", handleCancel);
-
-}
-
-function toggleEditMode(isEditMode) {
-  const editButtons = document.querySelectorAll(".edit-mode");
-  if (isEditMode) {
-    editButtons.forEach((button) => button.classList.remove("hidden"));
-  }
-  else {
-    editButtons.forEach((button) => button.classList.add("hidden"));
-  }
-
-
-}
-
-  // Display a popup with the roll result
-  function showPopup(message) {
-    const popup = document.createElement("div");
-    popup.textContent = message;
-    popup.className = "roll-popup";
-    document.body.appendChild(popup);
-  
-    // Remove the popup after 3 seconds
-    setTimeout(() => {
-      popup.remove();
-    }, 3000);
-  }
-  
-  function refreshUI() {
-    // Get references to the currently displayed encounter and statblock
-    const currentEncounterName = activeEncounter?.name || null;
-    const currentCreatureIndex = activeEncounter?.creatures.findIndex(creature =>
-      creature.name === document.querySelector("#statblock-content h4")?.textContent
-    ) || null;
-  
-    // Refresh the locations list
-    populateLocations();
-  
-    // Refresh the currently displayed encounter if it exists
-    if (currentEncounterName) {
-      const matchingEncounter = notebook.locations.flatMap(location => location.encounters)
-        .find(encounter => encounter.name === currentEncounterName);
-      if (matchingEncounter) {
-        activeEncounter = matchingEncounter; // Update activeEncounter
-        populateEncounter(matchingEncounter);
-      } else {
-        activeEncounter = null; // Reset if the encounter no longer exists
+window.addEventListener("load", function() {
+  setTimeout(function() {
+      const middleElement = document.getElementById("middle");
+      if (middleElement) {
+          middleElement.style.transition = "transform 0.3s ease-in-out, width 0.3s ease-in-out";
       }
-    }
-  
-    // Refresh the currently displayed statblock if it exists
-    if (currentCreatureIndex !== null && currentCreatureIndex >= 0) {
-      const matchingCreature = activeEncounter?.creatures[currentCreatureIndex];
-      if (matchingCreature) {
-        populateStatblock(matchingCreature); // Use the updated function name
-      } else {
-        // Clear statblock if the creature no longer exists
-        document.getElementById("statblock-content").innerHTML = "No creature selected.";
+  }, 1); // 1000 milliseconds = 1 second
+});
+
+// toggle sidebars on small screens
+
+document.addEventListener("DOMContentLoaded", function () {
+  const leftSidebar = document.getElementById("left");
+  const rightSidebar = document.getElementById("right");
+
+  function toggleSidebars() {
+      if (window.innerWidth < 1000){
+        if (leftSidebar.classList.contains("active") && rightSidebar.classList.contains("active")) {
+          leftSidebar.classList.remove("active");
+          rightSidebar.classList.remove("active");
       }
+      }
+      if (window.innerWidth < 705) {
+          if (leftSidebar.classList.contains("active")) {
+              rightSidebar.style.display = "none";
+          } else {
+              rightSidebar.style.display = "";
+          }
+
+          if (rightSidebar.classList.contains("active")) {
+              leftSidebar.style.display = "none";
+          } else {
+              leftSidebar.style.display = "";
+          }
+      } else {
+          leftSidebar.style.display = "";
+          rightSidebar.style.display = "";
+      }
+  }
+
+  const observer = new MutationObserver(toggleSidebars);
+  observer.observe(leftSidebar, { attributes: true, attributeFilter: ["class"] });
+  observer.observe(rightSidebar, { attributes: true, attributeFilter: ["class"] });
+
+  window.addEventListener("resize", toggleSidebars);
+  toggleSidebars(); // Initial check
+});
+
+//sidebar logic
+  function toggleLeft() {
+    const left = document.getElementById("left");
+    const right = document.getElementById("right");
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth <= 1000) {
+        // If screen width is 992px or less, close right sidebar before toggling left
+        if (right.classList.contains("active")) {
+            right.classList.remove("active");
+        }
     }
+
+    left.classList.toggle("active");
+
+    // Only call repositionMiddle if screen width is greater than 992
+    if (screenWidth > 705) {
+        repositionMiddle();
+    }
+}
+
+function toggleRight() {
+    const left = document.getElementById("left");
+    const right = document.getElementById("right");
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth <= 1000) {
+        // If screen width is 992px or less, close left sidebar before toggling right
+        if (left.classList.contains("active")) {
+            left.classList.remove("active");
+        }
+    }
+
+    right.classList.toggle("active");
+
+    // Only call repositionMiddle if screen width is greater than 992
+    if (screenWidth > 705) {
+        repositionMiddle();
+    }
+}
+
+function repositionMiddle() {
+  let left = document.getElementById("left");
+  let middle = document.getElementById("middle");
+  let right = document.getElementById("right");
+  
+  let leftActive = left.classList.contains("active");
+  let rightActive = right.classList.contains("active");
+  
+  let leftWidth = left.offsetWidth;
+  let rightWidth = right.offsetWidth;
+  
+  let translateValue = 0;
+  
+  if (leftActive && !rightActive) {
+      translateValue = leftWidth/2 - 15;
+  } else if (rightActive && !leftActive) {
+      translateValue = -(rightWidth/2 - 15);
+  } else if (leftActive && rightActive) {
+      translateValue = leftWidth/2 - rightWidth/2;
   }
   
-  
+  middle.style.transform = `translateX(${translateValue}px)`;
+}
+
+// resize handling logic
+
+function handleResize() {
+  const screenWidth = window.innerWidth;
+
+  if (screenWidth < 705) {
+      centerMiddle();
+  } else {
+      repositionMiddle();
+  }
+}
+
+window.addEventListener("resize", handleResize);
+
+handleResize();
+
+function centerMiddle(){
+  middle.style.transform = `translateX(0)`;
+}
+
