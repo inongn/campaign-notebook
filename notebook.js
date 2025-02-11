@@ -24,7 +24,7 @@ async function loadNotebookIndex(){
 
 async function loadSampleYAML() {
     try {
-        const response = await fetch('/sample.yaml?123'); // Fetch the YAML file from the home directory
+        const response = await fetch('/campaign-notebook/sample.yaml'); // Fetch the YAML file from the home directory
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
