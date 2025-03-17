@@ -1,5 +1,8 @@
 // Menu logic
 function openContextMenu(event, page, subpage) {
+  let backgroundBlocker = document.getElementById("background-blocker");
+  if (backgroundBlocker){
+  backgroundBlocker.style.display = "block";}
   event.stopPropagation(); // Prevents immediate closing due to bubbling
   const button = event.target.closest(".menu-button");
   if (!button) return;
@@ -18,6 +21,9 @@ function openContextMenu(event, page, subpage) {
       addMenuOption(menuOptions, "Add New", createNotebook);
       addMenuOption(menuOptions, "Rename", renameNotebook);
       addMenuOption(menuOptions, "Delete", deleteNotebook);
+      addMenuOption(menuOptions, "Export", exportData);
+      addMenuOption(menuOptions, "Import", importData);
+
   } else if (button.classList.contains("page-menu-button")) {
       addMenuOption(menuOptions, "Rename", () => renamePage(page));
       addMenuOption(menuOptions, "Delete", () => deletePage(page));
@@ -48,14 +54,20 @@ function openContextMenu(event, page, subpage) {
 
   // Delay adding the outside click listener to avoid immediate closing
   setTimeout(() => {
-      document.addEventListener("click", closeMenu);
-  }, 0);
+    document.addEventListener("pointerdown", closeMenu);
+    }, 0);
 }
 
-function closeMenu() {
+function closeMenu(event) {
   const menu = document.getElementById("context-menu");
+  if (!event || !menu.contains(event.target)) {
+
+  const backgroundBlocker = document.getElementById("background-blocker");
   menu.style.display = "none";
-  document.removeEventListener("click", closeMenu);
+  document.removeEventListener("pointerdown", closeMenu);
+  if (backgroundBlocker){
+    backgroundBlocker.style.display = "none";}
+  }
 }
 
 function addMenuOption(menuOptions, text, callback) {

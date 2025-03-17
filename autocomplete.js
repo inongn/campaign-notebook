@@ -17,8 +17,7 @@ class Encounter {
         this.monsterActions = encounterElement.querySelector(".monster-actions");
         this.cloneButton = encounterElement.querySelector(".clone-monster");
         this.saveButton = encounterElement.querySelector(".save-monster");
-        this.rollButton = encounterElement.querySelector(".roll-initiative");
-        this.rollButtonListener = false;
+        this.closeAutocomplete = this.closeAutocomplete.bind(this);
 
         // ========================
         // STATE VARIABLES (Instance-Specific)
@@ -37,11 +36,6 @@ class Encounter {
         this.input.addEventListener("input", () => this.updateAutocomplete());
         this.input.addEventListener("keydown", (e) => this.handleInputKeydown(e));
         this.input.addEventListener("focus", () => this.updateAutocomplete());
-        document.addEventListener("click", (event) => {
-            if (!this.input.contains(event.target)) {
-                this.autocompleteList.innerHTML = "";
-            }
-        });
 
         if (this.cloneButton) this.cloneButton.addEventListener("click", () => this.cloneMonster());
         if (this.saveButton) this.saveButton.addEventListener("click", () => this.saveCustomMonster());
@@ -57,6 +51,10 @@ class Encounter {
     }
 
     updateAutocomplete() {
+        document.addEventListener("click", this.closeAutocomplete);
+        this.autocompleteList.style.display ="block";
+        let backgroundBlocker = document.getElementById("background-blocker");
+        backgroundBlocker.style.display = "block";      
         const query = this.input.value.trim().toLowerCase();
         this.autocompleteList.innerHTML = "";
     
@@ -115,6 +113,16 @@ class Encounter {
         });
     }
     
+
+    closeAutocomplete(event){
+        if (!this.input.contains(event.target)) {
+            this.autocompleteList.innerHTML = ""
+            let backgroundBlocker = document.getElementById("background-blocker");
+            backgroundBlocker.style.display = "none";
+            this.autocompleteList.style.display ="none";
+            document.removeEventListener("click", this.closeAutocomplete);
+        }
+    }
 
     handleInputKeydown(event) {
         if (event.key === "Enter" && this.input.value.trim()) {
@@ -210,27 +218,16 @@ class Encounter {
             content = localStorage.getItem(`${monster}.md`) || "No content available.";
         } else {
             try {
-                const response = await fetch(`Monsters/${monster}.md`);
+                const response = await fetch(`campaign-notebook/Monsters/${monster}.md`);
                 if (!response.ok) throw new Error();
                 content = await response.text();
             } catch (error) {
                 content = "Error loading monster content.";
             }
         }
-        
-    // Remove any previous event listener before adding a new one
-    if (this.currentRollHandler) {
-        this.rollButton.removeEventListener("click", this.currentRollHandler);
-    }
-
-    // Define the new event handler
-    this.currentRollHandler = () => rollInitiative(content);
-
-    // Attach the new event listener
-    this.rollButton.addEventListener("click", this.currentRollHandler);
     
         // Parse the markdown to HTML using marked.js
-        const parsedContent = processHtmlContent(marked.parse(content));
+        const parsedContent = processHtmlContent(marked.parse(content),content);
         this.monsterContent.innerHTML = parsedContent;
         this.monsterContent.dataset.activeMonster = monster;
     
@@ -257,7 +254,7 @@ class Encounter {
                 content = "Error loading monster content.";
             }
         } else {
-            const response = await fetch("Monsters/Sample.md");
+            const response = await fetch("Monsters/Sample.md?1");
             content = await response.text();
         }
     
