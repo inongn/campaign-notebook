@@ -7,13 +7,20 @@
   <meta name="viewport" content="width=device-width">
   <title>Campaign Notebook</title>
   <link href="sample.yaml">
-<link rel="stylesheet" href="styles.css?12">
+<link rel="stylesheet" href="styles.css?dv0d.1d1djd1sd11111">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 
 </head>
 <body>
+    <div class="menu" id="context-menu">
+        <ul class="menu-options">
+        </ul>
+      </div>
+
+
+
 <div id="app">
 
     <div id="left" class="active">
@@ -33,6 +40,7 @@
                 New Tab
             </button>
         </div>
+        <button id="dark-mode-toggle" class="dark-mode-btn"><i class="fa-solid fa-circle-half-stroke"></i></button>
 
 
     </div>
@@ -44,15 +52,22 @@
                 
         <div id="content-content">
         </div>
+        <div id="background-blocker"></div>
+
     </div>
 
     <div id="right" class="">
         <button class="toggle-btn right-toggle" onclick="toggleRight()">☰</button>
         <div id="initiative-tracker">
+            
             <div id="initiative-tracker-buttons">
                 <button id="next-combatant-button" class="add-btn">
                     <i class="fas fa-forward-step"></i>
                     Next
+                </button>
+                <button id="roll-combatant-button" class="add-btn" onclick="rerollCombatants()">
+                    <i class="fas fa-dice-d20"></i>
+                    Re-Roll
                 </button>
                 <button id="add-combatant-row-button" class="add-btn">
                     <i class="fas fa-plus"></i>
@@ -69,28 +84,38 @@
                 </div>
             </div>
         </div>
+        <div id="party-member-section"></div> <!-- Party members rows will be added here -->
+        <div id="statblock-display">
+            <div id="statblock-content"></div>
+            <div id="statblock-spacer"></div>
+        </div>            
 
     </div>
 
     <div id="snackbar"></div>
 
 </div>
-  
-  <div class="menu" id="context-menu">
-    <ul class="menu-options">
-    </ul>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/text-style@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/paragraph@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="ui-helpers.js?2"></script>
-  <script src="initiative-tracker.js?q2"></script>
+  <script src="
+  https://cdn.jsdelivr.net/npm/editorjs-inline-tool@0.4.0/lib/index.min.js
+  "></script>
+  <script src="ui-helpers.js?vd0.d1"></script>
+  <script src="initiative-tracker.js?vdddd0.1"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
-  <script src="notebook.js?2hs"></script>
-  <script src="monsterData.js?1"></script>
-  <script src="autocomplete.js?1123"></script>
-  <script src="page.js?e23"></script>
-  <script src="context-menu.js?2sdsd3"></script>
-  <script src="encounters.js?2sdsd3"></script>
+  <script src="notebook.js?v0.s1sdcd1s"></script>
+  <script src="monsterData.js"></script>
+  <script src="autocomplete.js?1dsessaa1"></script>
+  <script src="page.js?sddwss1"></script>
+  <script src="context-menu.js?v0d.s2"></script>
+  <script src="encounters.js?112sdds12j3"></script>
+
 
 </body>
 </html>

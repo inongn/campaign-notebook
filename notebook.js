@@ -6,9 +6,21 @@ let notebookIndex = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadNotebookIndex();
-    populateNotebookSelect();
-    initializeNotebook(notebookIndex[0]);
-  });
+    await populateNotebookSelect();
+
+    let lastNotebook = localStorage.getItem("lastNotebook");
+    let lastPage = localStorage.getItem("lastPage");
+    let pageToLoad = lastPage;
+
+    if (lastNotebook && notebookIndex.includes(lastNotebook)) {
+        // Initialize notebook with the correct page
+        initializeNotebook(lastNotebook, pageToLoad);
+    } else {
+        // If no saved notebook, just initialize the first one
+        initializeNotebook(notebookIndex[0]);
+    }
+});
+
 
 
 async function loadNotebookIndex(){
@@ -47,32 +59,73 @@ async function populateNotebookSelect() {
     const selectElement = document.getElementById("notebook-select");
     selectElement.innerHTML = "";
 
+    let lastNotebook = localStorage.getItem("lastNotebook");
+
     notebookIndex.forEach((title) => {
         const option = document.createElement("option");
         option.value = title;
         option.textContent = title;
+
+        // Pre-select the last opened notebook
+        if (title === lastNotebook) {
+            option.selected = true;
+        }
+
         selectElement.appendChild(option);
     });
 
     if (!selectElement.dataset.listenerAdded) {
         selectElement.addEventListener("change", (event) => {
+            localStorage.setItem("lastNotebook", event.target.value); // Save selection
             initializeNotebook(event.target.value);
         });
-        selectElement.dataset.listenerAdded = "true"; // Mark listener as added
+        selectElement.dataset.listenerAdded = "true";
     }
-    }
+}
 
-function initializeNotebook(notebook) {
-    const notebookYAML = localStorage.getItem(`notebook_${notebook}`);
 
+function initializeNotebook(notebook, pageToOpen = null) {
+    const notebookYAML = localStorage.getItem(`notebook_${notebook}.yaml`);
+    
     if (notebookYAML) {
         activeNotebook = jsyaml.load(notebookYAML);
         populatePageList(activeNotebook);
-        populatePageContent(activeNotebook.notebook.pages[0])
+
+        let pageToLoad = null;
+
+        if (pageToOpen) {
+            // Look for the page in the notebook and its subpages
+            let pageFound = false;
+
+            activeNotebook.notebook.pages.forEach((page, pageIndex) => {
+                if (page.title === pageToOpen) {
+                    pageToLoad = activeNotebook.notebook.pages[pageIndex];
+                    pageFound = true;
+                }
+
+                if (!pageFound && page.subpages) {
+                    page.subpages.forEach((subpage, subpageIndex) => {
+                        if (subpage.title === pageToOpen) {
+                            pageToLoad = activeNotebook.notebook.pages[pageIndex].subpages[subpageIndex];
+                            pageFound = true;
+                        }
+                    });
+                }
+            });
+        }
+
+        // If the page was found, open it; otherwise, default to the first page
+        if (pageToLoad) {
+            populatePageContent(pageToLoad);
+        } else {
+            populatePageContent(activeNotebook.notebook.pages[0]);
+        }
     } else {
         console.error("Notebook not found.");
-    }  
     }
+}
+
+
 
 // populate page list
 async function populatePageList(yaml) {
@@ -111,7 +164,7 @@ async function populatePageList(yaml) {
 function createPageHeader(page) {
     const pageHeaderDiv = document.createElement("div");
     pageHeaderDiv.classList.add("page-header");
-    pageHeaderDiv.addEventListener("click", (event) => populatePageContent(page));
+    pageHeaderDiv.addEventListener("click", (event) => populatePageContent(page, event));
 
     const pageHeaderNameDiv = document.createElement("div");
     pageHeaderNameDiv.classList.add("page-header-name");
@@ -120,6 +173,30 @@ function createPageHeader(page) {
     pageIconBtn.classList.add("page-icon-btn");
     pageIconBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
 
+
+        // Handle collapse/expand if the page has subpages
+        if (page.subpages && page.subpages.length > 0) {
+            pageIconBtn.addEventListener("click", (event) => {
+                event.stopPropagation(); // Prevent triggering the page click event
+    
+                // Find the subpages container
+                const subpagesDiv = pageHeaderDiv.nextElementSibling;
+                if (subpagesDiv && subpagesDiv.classList.contains("page-subpages")) {
+                    subpagesDiv.classList.toggle("collapsed");
+    
+                    // Toggle chevron direction
+                    if (subpagesDiv.classList.contains("collapsed")) {
+                        pageIconBtn.innerHTML = '<i class="fas fa-chevron-right"></i>'; // Collapsed state
+                    } else {
+                        pageIconBtn.innerHTML = '<i class="fas fa-chevron-down"></i>'; // Expanded state
+                    }
+                }
+            });
+        } else {
+        // No subpages: Change the button to an interpunct
+        pageIconBtn.innerHTML = '<i class="fas fa-circle"></i>'; // Expanded state
+        }
+    
     const pageNameSpan = document.createElement("span");
     pageNameSpan.classList.add("page-name");
     pageNameSpan.textContent = page.title;
@@ -159,14 +236,14 @@ function createPageHeader(page) {
 function createSubpageHeader(subpage, page) {
     const subpageHeaderDiv = document.createElement("div");
     subpageHeaderDiv.classList.add("subpage-header");
-    subpageHeaderDiv.addEventListener("click", (event) => populatePageContent(subpage));
+    subpageHeaderDiv.addEventListener("click", (event) => populatePageContent(subpage, event));
 
     const subpageHeaderNameDiv = document.createElement("div");
     subpageHeaderNameDiv.classList.add("subpage-header-name");
 
     const subpageIconBtn = document.createElement("button");
-    subpageIconBtn.classList.add("interpunct");
-    subpageIconBtn.textContent = "●";
+    subpageIconBtn.classList.add("page-icon-btn");
+    subpageIconBtn.innerHTML = '<i class="fas fa-circle"></i>';
 
     const subpageNameSpan = document.createElement("span");
     subpageNameSpan.classList.add("page-name");
@@ -194,12 +271,66 @@ function createSubpageHeader(subpage, page) {
     return subpageHeaderDiv;
 }
 
-function populatePageContent(page) {
+function populatePageContent(page, event = null) {
     currentPage = page;
-    // Destroy existing Editor.js instance before creating a new one
-    if (editor) {
-        editor.destroy();
-        initEditor(page); // Call function to initialize a new editor
+
+    // Store the currently active notebook and page in localStorage
+    localStorage.setItem("lastNotebook", activeNotebook.notebook.title);
+    localStorage.setItem("lastPage", page.title);
+
+    // Remove 'active-page' from all page and subpage headers
+    document.querySelectorAll(".page-header, .subpage-header").forEach(header => {
+        header.classList.remove("active-page");
+    });
+
+    if (event) {
+        // If triggered by a click event, use event.currentTarget
+        event.currentTarget.classList.add("active-page");
+    } else {
+        // Use indexes to correctly mark the active page or subpage
+        let allPages = [...document.querySelectorAll(".page-header")];
+        let allSubpages = [...document.querySelectorAll(".subpage-header")];
+
+        let pageFound = false;
+
+        activeNotebook.notebook.pages.forEach((notebookPage, pageIndex) => {
+            if (notebookPage === page) {
+                if (allPages[pageIndex]) {
+                    allPages[pageIndex].classList.add("active-page");
+                    pageFound = true;
+                }
+            }
+
+            if (!pageFound && notebookPage.subpages) {
+                notebookPage.subpages.forEach((subpage, subpageIndex) => {
+                    if (subpage === page) {
+                        let parentPageHeader = allPages[pageIndex];
+                        let subpageHeaders = parentPageHeader.nextElementSibling?.querySelectorAll(".subpage-header");
+                        if (subpageHeaders && subpageHeaders[subpageIndex]) {
+                            subpageHeaders[subpageIndex].classList.add("active-page");
+                        }
+                        pageFound = true;
+                    }
+                });
+            }
+        });
+    }
+
+    // Update existing Editor.js instance instead of destroying it
+    if (editor && page.content) {
+        let savedData = page.content;
+        if (typeof savedData === "string") {
+            try {
+                savedData = JSON.parse(savedData);
+            } catch (e) {
+                console.error("Error parsing saved page content: ", e);
+                return;
+            }
+        }
+
+        if (savedData && savedData.blocks) {
+            editor.render(savedData);
+        }
     } else {
         initEditor(page);
     }
@@ -209,7 +340,35 @@ function initEditor(page) {
     editor = new EditorJS({
         holder: "content-content",
         tools: {
-            'encounter': EncounterBlock
+            paragraph: {
+                class: Paragraph,
+                inlineToolbar: true
+            },
+            header: {
+                class: Header,
+                inlineToolbar: true,
+                config: {
+                    placeholder: "Enter a header",
+                    levels: [1, 2, 3, 4, 5, 6],
+                    defaultLevel: 1
+                }
+            },
+            quote: {
+                class: Quote,
+                inlineToolbar: true,
+                config: {
+                    quotePlaceholder: "Enter a quote",
+                    captionPlaceholder: "Author"
+                }
+            },
+            list: {
+                class: EditorjsList,
+                inlineToolbar: true,
+                config: {
+                    defaultStyle: "unordered"
+                }
+            },
+            encounter: EncounterBlock
         },
         autofocus: true,
         placeholder: "Start writing your notes here...",
@@ -218,15 +377,15 @@ function initEditor(page) {
 
             if (typeof savedData === "string") {
                 try {
-                    savedData = JSON.parse(savedData); // Convert from JSON string to object
+                    savedData = JSON.parse(savedData);
                 } catch (e) {
+                    console.error("Error parsing initial content: ", e);
                     return;
                 }
             }
 
             if (savedData && savedData.blocks) {
-                editor.render(savedData); // Ensure it's a valid Editor.js format
-            } else {
+                editor.render(savedData);
             }
         },
         onChange: () => {
@@ -238,6 +397,7 @@ function initEditor(page) {
 async function saveEditorContent() {
     if (!editor || !currentPage) return;
 
+
     const savedData = await editor.save(); // Retrieve editor content
     currentPage.content = savedData; // Update page content in activeNotebook
     saveNotebook();
@@ -246,7 +406,7 @@ async function saveEditorContent() {
 // Function to save YAML to localStorage
 async function saveNotebook() {
     const notebookYAML = jsyaml.dump(activeNotebook);
-    localStorage.setItem(`notebook_${activeNotebook.notebook.title}`, notebookYAML);
+    localStorage.setItem(`notebook_${activeNotebook.notebook.title}.yaml`, notebookYAML);
     if (!notebookIndex.includes(activeNotebook.notebook.title)) {
         notebookIndex.push(activeNotebook.notebook.title);
         localStorage.setItem("notebooksIndex", JSON.stringify(notebookIndex));
@@ -462,4 +622,101 @@ function renameNotebook() {
     // Update selection in dropdown
     const selectElement = document.getElementById("notebook-select");
     selectElement.value = newTitle;
+}
+
+async function exportData() {
+    const zip = new JSZip();
+    
+    // Iterate through localStorage to find .md and .yaml files
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.endsWith(".md") || key.endsWith(".yaml")) {
+            const fileData = localStorage.getItem(key);
+            zip.file(key, fileData);
+        }
+    }
+    
+    try {
+        // Generate the zip file
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        
+        // Create a download link and trigger the download
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(zipBlob);
+        a.download = "exported_files.zip";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error("Error creating zip file:", error);
+    }
+}
+
+async function importData() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".yaml, .yml, .md, .zip"; // Accept YAML, Markdown, and ZIP files
+
+    input.addEventListener("change", async (event) => {
+        const file = event.target.files[0];
+
+        if (file) {
+            if (file.name.endsWith(".zip")) {
+                await handleZipFile(file);
+            } else {
+                await handleSingleFile(file);
+            }
+        }
+    });
+
+    input.click(); // Trigger file selection
+}
+
+async function handleSingleFile(file) {
+    const reader = new FileReader();
+    
+    reader.onload = function (e) {
+        const content = e.target.result;
+        const filename = file.name;
+        localStorage.setItem(filename, content);
+
+        if (filename.endsWith(".md")) {
+            // Extract "friendlyname" for Markdown
+            const friendlyname = filename.replace(/\.md$/, "");
+            customMonsters.push(friendlyname);
+            localStorage.setItem("customMonsters", JSON.stringify(customMonsters));
+
+        } else if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
+            // Extract "friendlyname" for YAML (remove "notebook_" prefix and extension)
+            const friendlyname = filename.replace(/^notebook_/, "").replace(/\.(yaml|yml)$/, "");
+            activeNotebook = jsyaml.load(content);
+            saveNotebook();
+            populateNotebookSelect();
+            const selectElement = document.getElementById("notebook-select");
+            selectElement.value = friendlyname;
+            initializeNotebook(friendlyname);
+        }
+    };
+
+    reader.readAsText(file);
+}
+
+async function handleZipFile(file) {
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+        const zipData = e.target.result;
+        const zip = await JSZip.loadAsync(zipData);
+
+        const filePromises = Object.keys(zip.files).map(async (filename) => {
+            if (filename.endsWith(".yaml") || filename.endsWith(".yml") || filename.endsWith(".md")) {
+                const fileContent = await zip.files[filename].async("text");
+                const extractedFile = new File([fileContent], filename, { type: "text/plain" });
+                await handleSingleFile(extractedFile);
+            }
+        });
+
+        await Promise.all(filePromises);
+    };
+
+    reader.readAsArrayBuffer(file);
 }
