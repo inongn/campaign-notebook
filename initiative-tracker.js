@@ -20,7 +20,7 @@ function initializeInitiativeTracker() {
           addPartyMemberRow(member.initiative, member.name, member.hp, member.ac);
       });
   } else {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
           addPartyMemberRow();
       }
   }
@@ -110,6 +110,7 @@ function savePartyMembersToLocalStorage() {
 function addCombatantRow(initiative = "", name = "", hp = "", ac = "") {
   const trackerContent = document.getElementById("initiative-tracker-content");
   let finalInitiative = "";
+
   if (initiative !== "")
     { 
   // Remove any row that has an empty input field
@@ -122,12 +123,22 @@ function addCombatantRow(initiative = "", name = "", hp = "", ac = "") {
     }
   }
   
+    for (let i = 0; i < existingRows.length; i++) {
+      const existingNameInput = existingRows[i].getElementsByTagName("input")[1]; // Getting the 'name' input field
+      if (existingNameInput && existingNameInput.value === name) { // Checking if name matches
+        finalInitiative = existingRows[i].getElementsByTagName("input")[0].value; // Use the same initiative
+        break;
+      }
+      else{
 
   // Calculate initiative value
   const randomRoll = Math.floor(Math.random() * 20) + 1; // Random number between 1 and 20
   finalInitiative = initiative ? randomRoll + parseInt(initiative, 10) : randomRoll;
   const message = `1d20${initiative >= 0 ? '+' : ''}${initiative}: ${finalInitiative}`; // Replace this line
   showSnackbar(message);
+      }
+    }
+  
   }
 
   // Create a new combatant row
