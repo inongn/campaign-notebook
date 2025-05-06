@@ -48,3 +48,19 @@ save() {
     return { chips };
   }
 }
+
+document.addEventListener('click', function(event) {
+  const target = event.target;
+  const href = target.getAttribute?.('href') || '';
+  if (target.tagName === 'A' && href.startsWith('combatant:')) {
+    let name = href.split(':')[1];
+    console.log(name);
+    name = name.replaceAll('-', ' ');
+    console.log(name);
+    let markdownContent = localStorage.getItem(`${name}.md`) || "No content available.";
+    let stats = extractCombatantStats(markdownContent);
+    console.log(stats);
+    addCombatantRow(stats[0],stats[1],stats[2],stats[3]);
+    event.preventDefault();
+  }
+});
