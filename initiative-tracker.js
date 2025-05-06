@@ -20,7 +20,7 @@ function initializeInitiativeTracker() {
           addPartyMemberRow(member.initiative, member.name, member.hp, member.ac);
       });
   } else {
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 4; i++) {
           addPartyMemberRow();
       }
   }
