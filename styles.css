@@ -961,5 +961,9 @@ svg {
 }
 
 a{
-    color:var(--blue-6);
+    color: var(--text-color);
+    text-decoration: none !important;
+    border-bottom-color: var(--blue-6);
+    border-bottom-width: 2px;
+    border-bottom-style: solid;
 }
