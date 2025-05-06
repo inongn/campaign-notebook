@@ -286,12 +286,6 @@ async function updateStatblockDisplay(combatantName) {
   const partyMemberNames = Array.from(partyRows).map(input => input.value.trim()).filter(name => name);
   let content = "";
 
-  // Only proceed if the combatant is a party member
-  if (!partyMemberNames.includes(combatantName.trim())) {
-    document.getElementById("statblock-content").innerHTML = processHtmlContent(marked.parse(content), content);
-      return;
-  }
-
 
   if (customMonsters.includes(combatantName)) {
       content = localStorage.getItem(`${combatantName}.md`) || "No content available.";
