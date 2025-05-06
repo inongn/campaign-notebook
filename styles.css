@@ -932,7 +932,6 @@ svg {
 }
 
 .ce-inline-toolbar{
-    display: none !important;
   }
   /*============== */
 /*Snackbar */
@@ -959,4 +958,8 @@ svg {
 #snackbar.show {
     visibility: visible;
     opacity: 1;
+}
+
+a{
+    color:var(--blue-6);
 }
