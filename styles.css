@@ -933,6 +933,10 @@ svg {
 
 .ce-inline-toolbar{
   }
+
+.ce-header{
+    font-weight:bold;
+}
   /*============== */
 /*Snackbar */
 /*============== */
