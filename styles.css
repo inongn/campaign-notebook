@@ -932,6 +932,7 @@ svg {
 }
 
 .ce-inline-toolbar{
+    display:none;
   }
 
 .ce-header{
