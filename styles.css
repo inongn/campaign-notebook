@@ -736,8 +736,8 @@ input{
 
 @media only screen and (max-width: 705px) {
     #left, #right{
-        width:90%;
-        max-width:90%;
+        width:100%;
+        max-width:100%;
         visibility: hidden;
     }
 
@@ -753,8 +753,8 @@ input{
 
 @media only screen and (max-width: 450px) {
     #left, #right{
-        width:90%;
-        max-width:90%;
+        width:100%;
+        max-width:100%;
         visibility: hidden;
     }
 
